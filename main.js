@@ -10,7 +10,6 @@ let types={
     app:["exe","dmg","pkg","deb","js"]
 }
 
-
 switch(command){
     case "tree":
         treefn(inputArr[1]);
@@ -26,7 +25,21 @@ switch(command){
 
     }
 
-function treefn(){
+function treefn(dirPath){
+    if(dirPath==undefined){
+        console.log("Please provide a valid directory path.");
+        return;
+    }
+    else{
+        if(fs.existsSync(dirPath)==false){
+            console.log("Provided directory path does not exist.");
+            return;
+        }
+        else{
+            treeHelper(dirPath, "");
+        }
+    }
+
     console.log("Tree command in process");
 }
 function organizefn(dirPath){
@@ -53,10 +66,14 @@ function organizefn(dirPath){
 }
 function helpfn(){
     console.log(`
-    
-    👉 node tree "dirPath"- for generating tree structure of current directory
-    👉 node organze "dirPath" - for organzing files into different folder according to their extensions
-    👉 node help - for information about different commands 
+    📌 List of available commands are:    
+
+        1️⃣  node tree "dirPath"- for generating tree structure of current directory
+
+        2️⃣  node organze "dirPath" - for organzing files into different folder according to their extensions
+
+        3️⃣  node help - for information about different commands 
+        
     `
     );
 }
@@ -104,11 +121,22 @@ function sendFiles(srcFilePath,destPath,category){
     
 }
 
+function treeHelper(dirPath,indent){
+    let isFile = fs.lstatSync(dirPath).isFile();
+    
+    if(isFile == true){
+        let fileName=path.basename(dirPath)
+        console.log(indent+"|-----"+ fileName)
+    }
+    else{
+        let dirName=path.basename(dirPath)
+        console.log(indent+"|_____"+dirName);
+        let children=fs.readdirSync(dirPath);
 
+        for(let i=0;i<children.length;i++){
+            let childPath = path.join(dirPath,children[i]);
+            treeHelper(childPath,indent+"\t")
+        }
+    }
 
-
-
-
-
-
-
+}
